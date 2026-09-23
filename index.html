@@ -4,16 +4,123 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KANCA — Gizlilik Politikası / Privacy Policy</title>
+<script>
+  // Apply the theme immediately to avoid flash of unstyled content
+  (function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
 <style>
-  body{max-width:760px;margin:40px auto;padding:0 20px;font-family:system-ui,Arial,sans-serif;
-    color:#1a1a2e;line-height:1.6}
-  h1{font-size:26px} h2{font-size:19px;margin-top:28px;border-bottom:1px solid #ddd;padding-bottom:4px}
-  .muted{color:#666;font-size:14px} code{background:#f0f0f5;padding:1px 5px;border-radius:4px}
-  hr{margin:40px 0;border:none;border-top:1px solid #ccc}
+  :root {
+    --bg-color: #f4f4f9;
+    --text-color: #1a1a2e;
+    --card-bg: #ffffff;
+    --muted-color: #666;
+    --code-bg: #f0f0f5;
+    --border-color: #ddd;
+    --toggle-bg: #e4e4e9;
+    --toggle-fg: #1a1a2e;
+    --toggle-hover: #d4d4d9;
+  }
+
+  [data-theme="dark"] {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --card-bg: #1e1e1e;
+    --muted-color: #a0a0a0;
+    --code-bg: #2d2d2d;
+    --border-color: #444;
+    --toggle-bg: #333;
+    --toggle-fg: #e0e0e0;
+    --toggle-hover: #444;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    line-height: 1.6;
+    margin: 0;
+    padding: 40px 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  @media (max-width: 600px) {
+    body {
+      padding: 20px 10px;
+    }
+    .card {
+      padding: 24px;
+      border-radius: 12px;
+    }
+  }
+
+  .toggle-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+  }
+
+  .toggle-btn {
+    background-color: var(--toggle-bg);
+    color: var(--toggle-fg);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  }
+
+  .toggle-btn:hover {
+    background-color: var(--toggle-hover);
+  }
+
+  .toggle-btn:active {
+    transform: scale(0.96);
+  }
+
+  h1 { font-size: 26px; margin-top: 0; }
+  h2 { font-size: 19px; margin-top: 28px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; transition: border-color 0.3s ease; }
+  .muted { color: var(--muted-color); font-size: 14px; transition: color 0.3s ease; }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.9em; transition: background-color 0.3s ease; }
+  hr { margin: 40px 0; border: none; border-top: 1px solid var(--border-color); transition: border-color 0.3s ease; }
 </style>
 </head>
 <body>
+<div class="container">
+  <div class="toggle-container">
+    <button id="theme-toggle" class="toggle-btn" aria-label="Toggle Dark Mode">
+      <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <span id="theme-text">Dark Mode</span>
+    </button>
+  </div>
 
+  <div class="card">
 <h1>KANCA — Gizlilik Politikası</h1>
 <p class="muted">Son güncelleme: 30 Temmuz 2026 · Geliştirici: Furkan Üstündağ (Fustundag) · İletişim: furkanustundag0@gmail.com</p>
 
@@ -63,6 +170,36 @@
 
 <h2>Changes</h2>
 <p>If this policy changes, the updated version will be posted on this page with a revised date above.</p>
+  </div>
+</div>
 
+<script>
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  const themeText = document.getElementById('theme-text');
+  const themeIcon = document.getElementById('theme-icon');
+
+  function updateToggleUI(theme) {
+    if (theme === 'dark') {
+      themeText.textContent = 'Light Mode';
+      themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+    } else {
+      themeText.textContent = 'Dark Mode';
+      themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+    }
+  }
+
+  // Initialize UI based on current theme
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  updateToggleUI(currentTheme);
+
+  themeToggleBtn.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+    let targetTheme = theme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', targetTheme);
+    localStorage.setItem('theme', targetTheme);
+    updateToggleUI(targetTheme);
+  });
+</script>
 </body>
 </html>
