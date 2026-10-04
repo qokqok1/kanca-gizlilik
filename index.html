@@ -2,67 +2,1329 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KANCA — Gizlilik Politikası / Privacy Policy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KANCA — Maden Macera Oyunu / Grappling Hook Mine Game</title>
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
 <style>
-  body{max-width:760px;margin:40px auto;padding:0 20px;font-family:system-ui,Arial,sans-serif;
-    color:#1a1a2e;line-height:1.6}
-  h1{font-size:26px} h2{font-size:19px;margin-top:28px;border-bottom:1px solid #ddd;padding-bottom:4px}
-  .muted{color:#666;font-size:14px} code{background:#f0f0f5;padding:1px 5px;border-radius:4px}
-  hr{margin:40px 0;border:none;border-top:1px solid #ccc}
+  :root {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --panel-bg: rgba(30, 41, 59, 0.85);
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-hover: #0284c7;
+    --gold: #fbbf24;
+    --crystal: #a855f7;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --modal-overlay: rgba(0, 0, 0, 0.75);
+    --btn-bg: #334155;
+    --btn-hover: #475569;
+  }
+
+  [data-theme="light"] {
+    --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    --panel-bg: rgba(255, 255, 255, 0.9);
+    --card-bg: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent: #0284c7;
+    --accent-hover: #0369a1;
+    --gold: #d97706;
+    --crystal: #7e22ce;
+    --border-color: rgba(0, 0, 0, 0.1);
+    --modal-overlay: rgba(15, 23, 42, 0.6);
+    --btn-bg: #e2e8f0;
+    --btn-hover: #cbd5e1;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+    overflow-x: hidden;
+  }
+
+  /* Header & Navigation Bar */
+  .header-bar {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .logo-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--accent);
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
+  }
+
+  .nav-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    background: var(--btn-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .icon-btn:hover {
+    background: var(--btn-hover);
+    transform: translateY(-1px);
+  }
+
+  .icon-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Game Container */
+  .game-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* HUD Panel */
+  .hud-panel {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 14px 14px 0 0;
+    padding: 10px 14px;
+  }
+
+  .hud-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hud-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+
+  .hud-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+
+  .hud-value.gold-val { color: var(--gold); }
+  .hud-value.crystal-val { color: var(--crystal); }
+
+  /* Canvas styling */
+  #gameCanvas {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 14px 14px;
+    touch-action: manipulation;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+  }
+
+  /* Action Bar under canvas */
+  .game-controls-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .primary-action-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .primary-action-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+  }
+
+  /* Modals */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--modal-overlay);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+  }
+
+  .modal.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+  }
+
+  .modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+
+  .close-btn:hover {
+    color: var(--text-main);
+  }
+
+  /* Shop Grid */
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  .shop-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .shop-title {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .shop-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .shop-buy-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .shop-buy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--btn-bg);
+    color: var(--text-muted);
+  }
+
+  /* Goals List */
+  .goals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .goal-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .goal-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .goal-title { font-weight: 700; font-size: 15px; }
+  .goal-desc { font-size: 13px; color: var(--text-muted); }
+  .goal-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .goal-badge.locked { background: var(--btn-bg); color: var(--text-muted); }
+  .goal-badge.unlocked { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; }
+
+  /* Policy Modal specific styles */
+  .policy-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-main);
+  }
+  .policy-body h1 { font-size: 20px; margin-top: 16px; margin-bottom: 6px; }
+  .policy-body h2 { font-size: 16px; margin-top: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+  .policy-body .muted { color: var(--text-muted); font-size: 12px; margin-bottom: 12px; }
+  .policy-body code { background: var(--btn-bg); padding: 2px 6px; border-radius: 4px; }
+  .policy-body hr { margin: 24px 0; border: none; border-top: 1px solid var(--border-color); }
+
+  @media (max-width: 600px) {
+    body { padding: 6px; }
+    .header-bar { padding: 10px; }
+    .logo-title { font-size: 18px; }
+    .hud-panel { padding: 8px; }
+    .hud-label { font-size: 9px; }
+    .hud-value { font-size: 14px; }
+    .icon-btn span.btn-label { display: none; }
+  }
 </style>
 </head>
 <body>
 
-<h1>KANCA — Gizlilik Politikası</h1>
-<p class="muted">Son güncelleme: 30 Temmuz 2026 · Geliştirici: Furkan Üstündağ (Fustundag) · İletişim: furkanustundag0@gmail.com</p>
+<div class="header-bar">
+  <div class="logo-title">
+    <svg class="logo-icon" viewBox="0 0 24 24">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+    </svg>
+    <span>KANCA</span>
+  </div>
+  <div class="nav-tools">
+    <button id="shop-btn" class="icon-btn" title="Market / Shop">
+      🛒 <span class="btn-label" data-tr="Market" data-en="Shop">Market</span>
+    </button>
+    <button id="goals-btn" class="icon-btn" title="Hedefler / Goals">
+      🏆 <span class="btn-label" data-tr="Hedefler" data-en="Goals">Hedefler</span>
+    </button>
+    <button id="audio-btn" class="icon-btn" title="Ses / Sound">
+      🔊
+    </button>
+    <button id="lang-btn" class="icon-btn" title="Dil / Language">
+      🌐 <span id="lang-text">TR</span>
+    </button>
+    <button id="theme-btn" class="icon-btn" title="Karanlık Mod / Dark Mode">
+      🌙
+    </button>
+    <button id="policy-btn" class="icon-btn" title="Gizlilik / Privacy">
+      📋
+    </button>
+  </div>
+</div>
 
-<h2>Kısa özet</h2>
-<p><strong>KANCA hiçbir kişisel veri toplamaz, saklamaz veya paylaşmaz.</strong> Oyun tamamen çevrimdışı çalışır; internet bağlantısı gerektirmez, hiçbir sunucuya veri göndermez.</p>
+<div class="game-wrapper">
+  <div class="hud-panel">
+    <div class="hud-item">
+      <span class="hud-label" data-tr="SKOR" data-en="SCORE">SKOR</span>
+      <span id="score-val" class="hud-value">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label" data-tr="HEDEF" data-en="TARGET">HEDEF</span>
+      <span id="target-val" class="hud-value">500</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label" data-tr="SÜRE" data-en="TIME">SÜRE</span>
+      <span id="time-val" class="hud-value">60</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label" data-tr="SEVİYE" data-en="LEVEL">SEVİYE</span>
+      <span id="level-val" class="hud-value">1</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label" data-tr="KRİSTAL" data-en="SHARDS">KRİSTAL</span>
+      <span id="crystal-val" class="hud-value crystal-val">0</span>
+    </div>
+  </div>
 
-<h2>Toplanan veriler</h2>
-<p><strong>Hiçbiri.</strong> Uygulama; ad, e-posta, konum, kişiler, cihaz kimliği, reklam kimliği veya kullanım verisi dahil <em>hiçbir kişisel bilgi</em> toplamaz.</p>
+  <canvas id="gameCanvas" width="800" height="500"></canvas>
 
-<h2>Cihazda saklanan bilgiler</h2>
-<p>Oyun yalnızca senin cihazında, oyunun kendi yerel deposunda (<code>localStorage</code>) şunları tutar: en yüksek skorun, toplanan kristal sayın, satın aldığın yükseltmeler, açtığın hedefler ve dil tercihin. Bu bilgiler <strong>cihazından hiçbir zaman çıkmaz</strong>, kimseyle paylaşılmaz ve uygulamayı silersen kaybolur.</p>
+  <div class="game-controls-bar">
+    <button id="launch-btn" class="primary-action-btn" data-tr="KANCA AT (BOŞLUK / TIKLA)" data-en="LAUNCH HOOK (SPACE / CLICK)">
+      KANCA AT (BOŞLUK / TIKLA)
+    </button>
+  </div>
+</div>
 
-<h2>İzinler</h2>
-<p>Uygulama yalnızca standart <code>INTERNET</code> iznini içerir (Android WebView bileşeninin varsayılan gereksinimi); ancak oyun bu izni <strong>fiilen kullanmaz</strong> — hiçbir ağ isteği yapmaz. Kamera, mikrofon, konum, kişiler veya depolama iznine erişmez.</p>
+<!-- Shop Modal -->
+<div id="shop-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title" data-tr="Yükseltme Marketi" data-en="Upgrade Shop">Yükseltme Marketi</h3>
+      <button class="close-btn">&times;</button>
+    </div>
+    <div class="shop-grid" id="shop-container"></div>
+  </div>
+</div>
 
-<h2>Reklam ve satın alma</h2>
-<p>Uygulamada <strong>reklam yoktur</strong> ve <strong>uygulama içi satın alma yoktur</strong>. Üçüncü taraf reklam ağı, analiz aracı veya izleyici (SDK) kullanılmaz.</p>
+<!-- Goals Modal -->
+<div id="goals-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title" data-tr="Başarılar & Hedefler" data-en="Achievements & Goals">Başarılar & Hedefler</h3>
+      <button class="close-btn">&times;</button>
+    </div>
+    <div class="goals-list" id="goals-container"></div>
+  </div>
+</div>
 
-<h2>Çocuklar</h2>
-<p>Uygulama hiçbir veri toplamadığından her yaş için güvenlidir ve çocuklardan bilerek veri toplamaz.</p>
+<!-- Privacy Policy Modal -->
+<div id="policy-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title" data-tr="Gizlilik Politikası" data-en="Privacy Policy">Gizlilik Politikası</h3>
+      <button class="close-btn">&times;</button>
+    </div>
+    <div class="policy-body">
+      <h1>KANCA — Gizlilik Politikası</h1>
+      <p class="muted">Son güncelleme: 30 Temmuz 2026 · Geliştirici: Furkan Üstündağ (Fustundag) · İletişim: furkanustundag0@gmail.com</p>
 
-<h2>Değişiklikler</h2>
-<p>Bu politika güncellenirse yeni sürüm bu sayfada yayımlanır ve üstteki tarih güncellenir.</p>
+      <h2>Kısa özet</h2>
+      <p><strong>KANCA hiçbir kişisel veri toplamaz, saklamaz veya paylaşmaz.</strong> Oyun tamamen çevrimdışı çalışır; internet bağlantısı gerektirmez, hiçbir sunucuya veri göndermez.</p>
 
-<hr>
+      <h2>Toplanan veriler</h2>
+      <p><strong>Hiçbiri.</strong> Uygulama; ad, e-posta, konum, kişiler, cihaz kimliği, reklam kimliği veya kullanım verisi dahil <em>hiçbir kişisel bilgi</em> toplamaz.</p>
 
-<h1>KANCA — Privacy Policy (English)</h1>
-<p class="muted">Last updated: 30 July 2026 · Developer: Furkan Üstündağ (Fustundag) · Contact: furkanustundag0@gmail.com</p>
+      <h2>Cihazda saklanan bilgiler</h2>
+      <p>Oyun yalnızca senin cihazında, oyunun kendi yerel deposunda (<code>localStorage</code>) şunları tutar: en yüksek skorun, toplanan kristal sayın, satın aldığın yükseltmeler, açtığın hedefler ve dil tercihin. Bu bilgiler <strong>cihazından hiçbir zaman çıkmaz</strong>, kimseyle paylaşılmaz ve uygulamayı silersen kaybolur.</p>
 
-<h2>Summary</h2>
-<p><strong>KANCA collects, stores, and shares no personal data.</strong> The game runs fully offline, requires no internet connection, and sends no data to any server.</p>
+      <h2>İzinler</h2>
+      <p>Uygulama yalnızca standart <code>INTERNET</code> iznini içerir (Android WebView bileşeninin varsayılan gereksinimi); ancak oyun bu izni <strong>fiilen kullanmaz</strong> — hiçbir ağ isteği yapmaz. Kamera, mikrofon, konum, kişiler veya depolama iznine erişmez.</p>
 
-<h2>Data collected</h2>
-<p><strong>None.</strong> The app collects no personal information whatsoever — no name, email, location, contacts, device ID, advertising ID, or usage data.</p>
+      <h2>Reklam ve satın alma</h2>
+      <p>Uygulamada <strong>reklam yoktur</strong> ve <strong>uygulama içi satın alma yoktur</strong>. Üçüncü taraf reklam ağı, analiz aracı veya izleyici (SDK) kullanılmaz.</p>
 
-<h2>Information stored on your device</h2>
-<p>The game stores only the following in its own local storage (<code>localStorage</code>) on your device: your high score, collected shards, purchased upgrades, unlocked goals, and language preference. This information <strong>never leaves your device</strong>, is shared with no one, and is deleted if you uninstall the app.</p>
+      <h2>Çocuklar</h2>
+      <p>Uygulama hiçbir veri toplamadığından her yaş için güvenlidir ve çocuklardan bilerek veri toplamaz.</p>
 
-<h2>Permissions</h2>
-<p>The app declares only the standard <code>INTERNET</code> permission (a default requirement of the Android WebView component), but the game <strong>does not actually use it</strong> — it makes no network requests. It does not access camera, microphone, location, contacts, or storage.</p>
+      <h2>Değişiklikler</h2>
+      <p>Bu politika güncellenirse yeni sürüm bu sayfada yayımlanır ve üstteki tarih güncellenir.</p>
 
-<h2>Ads and purchases</h2>
-<p>The app contains <strong>no ads</strong> and <strong>no in-app purchases</strong>. No third-party ad networks, analytics, or trackers (SDKs) are used.</p>
+      <hr>
 
-<h2>Children</h2>
-<p>Because the app collects no data, it is safe for all ages and knowingly collects no data from children.</p>
+      <h1>KANCA — Privacy Policy (English)</h1>
+      <p class="muted">Last updated: 30 July 2026 · Developer: Furkan Üstündağ (Fustundag) · Contact: furkanustundag0@gmail.com</p>
 
-<h2>Changes</h2>
-<p>If this policy changes, the updated version will be posted on this page with a revised date above.</p>
+      <h2>Summary</h2>
+      <p><strong>KANCA collects, stores, and shares no personal data.</strong> The game runs fully offline, requires no internet connection, and sends no data to any server.</p>
 
+      <h2>Data collected</h2>
+      <p><strong>None.</strong> The app collects no personal information whatsoever — no name, email, location, contacts, device ID, advertising ID, or usage data.</p>
+
+      <h2>Information stored on your device</h2>
+      <p>The game stores only the following in its own local storage (<code>localStorage</code>) on your device: your high score, collected shards, purchased upgrades, unlocked goals, and language preference. This information <strong>never leaves your device</strong>, is shared with no one, and is deleted if you uninstall the app.</p>
+
+      <h2>Permissions</h2>
+      <p>The app declares only the standard <code>INTERNET</code> permission (a default requirement of the Android WebView component), but the game <strong>does not actually use it</strong> — it makes no network requests. It does not access camera, microphone, location, contacts, or storage.</p>
+
+      <h2>Ads and purchases</h2>
+      <p>The app contains <strong>no ads</strong> and <strong>no in-app purchases</strong>. No third-party ad networks, analytics, or trackers (SDKs) are used.</p>
+
+      <h2>Children</h2>
+      <p>Because the app collects no data, it is safe for all ages and knowingly collects no data from children.</p>
+
+      <h2>Changes</h2>
+      <p>If this policy changes, the updated version will be posted on this page with a revised date above.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Web Audio API Audio Synthesizer
+class SoundSystem {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  playTone(freq, duration, type = 'sine', startVol = 0.3, endVol = 0.01) {
+    if (this.muted || !this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(startVol, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(endVol, this.ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    } catch(e){}
+  }
+
+  playLaunch() {
+    this.init();
+    if (this.muted || !this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.15);
+    } catch(e){}
+  }
+
+  playGrab() {
+    this.init();
+    this.playTone(800, 0.1, 'triangle', 0.4, 0.01);
+  }
+
+  playCollect(isCrystal) {
+    this.init();
+    if (this.muted || !this.ctx) return;
+    if (isCrystal) {
+      [1046.5, 1318.5, 1567.98, 2093.0].forEach((freq, idx) => {
+        setTimeout(() => this.playTone(freq, 0.25, 'sine', 0.3, 0.001), idx * 60);
+      });
+    } else {
+      this.playTone(587.33, 0.1, 'sine', 0.3, 0.01);
+      setTimeout(() => this.playTone(880, 0.2, 'sine', 0.3, 0.01), 70);
+    }
+  }
+
+  playLevelComplete() {
+    this.init();
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      setTimeout(() => this.playTone(freq, 0.3, 'triangle', 0.4, 0.01), idx * 120);
+    });
+  }
+
+  playGameOver() {
+    this.init();
+    const notes = [400, 350, 300, 250];
+    notes.forEach((freq, idx) => {
+      setTimeout(() => this.playTone(freq, 0.3, 'sawtooth', 0.3, 0.01), idx * 150);
+    });
+  }
+}
+
+const audioSystem = new SoundSystem();
+
+// Game State & Persistence Data
+const LOCAL_STORAGE_KEY = 'kanca_game_data';
+
+const defaultState = {
+  highScore: 0,
+  crystals: 0,
+  language: 'tr',
+  upgrades: {
+    strength: 0,
+    hookSpeed: 0,
+    crystalBonus: 0
+  },
+  unlockedGoals: []
+};
+
+let gameState = { ...defaultState };
+
+function loadSavedState() {
+  try {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      gameState = { ...defaultState, ...parsed, upgrades: { ...defaultState.upgrades, ...(parsed.upgrades || {}) } };
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(gameState));
+  } catch(e) {}
+}
+
+// Goals Configuration
+const GOALS = [
+  { id: 'first_mine', tr: 'İlk Madenci', en: 'First Miner', descTr: 'İlk kristalini topla.', descEn: 'Collect your first shard.', check: (s) => s.crystals >= 1 },
+  { id: 'crystal_hoarder', tr: 'Kristal Avcısı', en: 'Shard Hoarder', descTr: 'Toplam 10 kristal topla.', descEn: 'Collect 10 total shards.', check: (s) => s.crystals >= 10 },
+  { id: 'master_miner', tr: 'Usta Madenci', en: 'Master Miner', descTr: '5. Seviyeye ulaş.', descEn: 'Reach Level 5.', check: (s, level) => level >= 5 },
+  { id: 'high_scorer', tr: 'Yüksek Skor', en: 'High Scorer', descTr: 'Tek turda 2000 puana ulaş.', descEn: 'Reach 2000 points in one round.', check: (s, level, score) => score >= 2000 }
+];
+
+// Upgrades Configuration
+const UPGRADES = [
+  {
+    id: 'strength',
+    tr: 'Çekme Kuvveti',
+    en: 'Pull Strength',
+    descTr: 'Ağır cisimleri ve kristalleri daha hızlı çekersin.',
+    descEn: 'Reel back heavy objects and shards faster.',
+    maxLevel: 5,
+    baseCost: 5,
+    costMult: 1.8
+  },
+  {
+    id: 'hookSpeed',
+    tr: 'Kanca Hızı',
+    en: 'Hook Speed',
+    descTr: 'Kanca daha hızlı fırlatılır.',
+    descEn: 'Hook launches forward much faster.',
+    maxLevel: 5,
+    baseCost: 5,
+    costMult: 1.8
+  },
+  {
+    id: 'crystalBonus',
+    tr: 'Kristal Çarpanı',
+    en: 'Shard Multiplier',
+    descTr: 'Toplanan kristaller ekstra puan kazandırır.',
+    descEn: 'Collected shards give bonus score.',
+    maxLevel: 5,
+    baseCost: 8,
+    costMult: 2.0
+  }
+];
+
+// Canvas & Engine Setup
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let level = 1;
+let score = 0;
+let targetScore = 500;
+let timeLeft = 60;
+let roundActive = false;
+let gameMode = 'START'; // START, PLAYING, LEVEL_CLEAR, GAME_OVER
+
+// Miner / Pivot position
+const pivot = { x: 400, y: 70 };
+
+// Hook State
+const hook = {
+  x: 400,
+  y: 70,
+  angle: 0,
+  angleSpeed: 0.025,
+  angleDir: 1,
+  length: 30,
+  minL: 30,
+  maxL: 550,
+  state: 'SWING',
+  caughtItem: null
+};
+
+// World Items
+let items = [];
+let particles = [];
+let floatingTexts = [];
+let timerInterval = null;
+let screenShake = 0;
+
+// Particle Engine
+function createParticles(x, y, color, count = 12) {
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 1 + Math.random() * 4;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      radius: 2 + Math.random() * 3,
+      color,
+      alpha: 1,
+      life: 0.03 + Math.random() * 0.03
+    });
+  }
+}
+
+function addFloatingText(x, y, text, color = '#fbbf24') {
+  floatingTexts.push({
+    x, y,
+    text,
+    color,
+    alpha: 1,
+    vy: -1.2
+  });
+}
+
+function spawnLevelItems() {
+  items = [];
+  const itemCount = 10 + Math.min(level * 2, 10);
+  const padding = 50;
+
+  for (let i = 0; i < itemCount; i++) {
+    let valid = false;
+    let attempts = 0;
+    let item = {};
+
+    while (!valid && attempts < 100) {
+      attempts++;
+      const x = padding + Math.random() * (canvas.width - padding * 2);
+      const y = 140 + Math.random() * (canvas.height - 180);
+
+      const isCrystal = Math.random() < 0.45;
+      const sizeType = Math.random();
+
+      let radius, value, weight, color, label;
+
+      if (isCrystal) {
+        if (sizeType < 0.5) {
+          radius = 14; value = 250; weight = 1.2; color = '#c084fc'; label = 'crystal_sm';
+        } else if (sizeType < 0.85) {
+          radius = 20; value = 500; weight = 2.0; color = '#a855f7'; label = 'crystal_md';
+        } else {
+          radius = 28; value = 1000; weight = 3.5; color = '#7e22ce'; label = 'crystal_lg';
+        }
+      } else {
+        if (sizeType < 0.6) {
+          radius = 16; value = 100; weight = 1.5; color = '#f59e0b'; label = 'gold_sm';
+        } else {
+          radius = 26; value = 300; weight = 4.0; color = '#d97706'; label = 'gold_lg';
+        }
+      }
+
+      item = { x, y, radius, value, weight, color, isCrystal, label };
+
+      // Performance optimization: Use squared distance check to avoid Math.sqrt overhead
+      valid = true;
+      for (let j = 0; j < items.length; j++) {
+        const other = items[j];
+        const dx = other.x - item.x;
+        const dy = other.y - item.y;
+        const minDist = other.radius + item.radius + 15;
+        if (dx * dx + dy * dy < minDist * minDist) {
+          valid = false;
+          break;
+        }
+      }
+    }
+
+    if (valid) items.push(item);
+  }
+}
+
+function startLevel() {
+  gameMode = 'PLAYING';
+  roundActive = true;
+  timeLeft = Math.max(30, 65 - level * 3);
+  targetScore = 400 + level * 350;
+
+  hook.state = 'SWING';
+  hook.length = hook.minL;
+  hook.caughtItem = null;
+
+  spawnLevelItems();
+  updateHUD();
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (gameMode === 'PLAYING') {
+      timeLeft--;
+      updateHUD();
+      if (timeLeft <= 0) {
+        endRound();
+      }
+    }
+  }, 1000);
+}
+
+function endRound() {
+  clearInterval(timerInterval);
+  roundActive = false;
+  if (score >= targetScore) {
+    gameMode = 'LEVEL_CLEAR';
+    audioSystem.playLevelComplete();
+    checkGoals();
+  } else {
+    gameMode = 'GAME_OVER';
+    audioSystem.playGameOver();
+    if (score > gameState.highScore) {
+      gameState.highScore = score;
+    }
+    saveState();
+  }
+}
+
+function checkGoals() {
+  GOALS.forEach(goal => {
+    if (!gameState.unlockedGoals.includes(goal.id)) {
+      if (goal.check(gameState, level, score)) {
+        gameState.unlockedGoals.push(goal.id);
+        addFloatingText(400, 200, `🏆 HEDEF AÇILDI: ${gameState.language === 'tr' ? goal.tr : goal.en}!`, '#22c55e');
+      }
+    }
+  });
+  saveState();
+}
+
+function triggerLaunch() {
+  if (gameMode === 'START' || gameMode === 'GAME_OVER') {
+    score = 0;
+    level = 1;
+    startLevel();
+    return;
+  }
+  if (gameMode === 'LEVEL_CLEAR') {
+    level++;
+    startLevel();
+    return;
+  }
+  if (gameMode === 'PLAYING' && hook.state === 'SWING') {
+    hook.state = 'EXTEND';
+    audioSystem.playLaunch();
+  }
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    triggerLaunch();
+  }
+});
+
+canvas.addEventListener('click', () => {
+  triggerLaunch();
+});
+
+document.getElementById('launch-btn').addEventListener('click', () => {
+  triggerLaunch();
+});
+
+function updateHUD() {
+  document.getElementById('score-val').textContent = score;
+  document.getElementById('target-val').textContent = targetScore;
+  document.getElementById('time-val').textContent = timeLeft;
+  document.getElementById('level-val').textContent = level;
+  document.getElementById('crystal-val').textContent = gameState.crystals;
+}
+
+function updateLanguageUI() {
+  const isTr = gameState.language === 'tr';
+  document.getElementById('lang-text').textContent = isTr ? 'TR' : 'EN';
+
+  document.querySelectorAll('[data-tr]').forEach(el => {
+    const text = isTr ? el.getAttribute('data-tr') : el.getAttribute('data-en');
+    if (text) el.textContent = text;
+  });
+
+  renderShop();
+  renderGoals();
+}
+
+function renderShop() {
+  const container = document.getElementById('shop-container');
+  container.innerHTML = '';
+  const isTr = gameState.language === 'tr';
+
+  UPGRADES.forEach(upg => {
+    const curLevel = gameState.upgrades[upg.id] || 0;
+    const isMax = curLevel >= upg.maxLevel;
+    const cost = Math.round(upg.baseCost * Math.pow(upg.costMult, curLevel));
+    const canAfford = gameState.crystals >= cost && !isMax;
+
+    const card = document.createElement('div');
+    card.className = 'shop-card';
+    card.innerHTML = `
+      <div>
+        <div class="shop-title">${isTr ? upg.tr : upg.en} (Lvl ${curLevel}/${upg.maxLevel})</div>
+        <div class="shop-desc">${isTr ? upg.descTr : upg.descEn}</div>
+      </div>
+      <button class="shop-buy-btn" ${canAfford ? '' : 'disabled'}>
+        <span>${isMax ? (isTr ? 'MAKSİMUM' : 'MAXED') : (isTr ? 'Yükselt' : 'Upgrade')}</span>
+        <span>${isMax ? '' : `💎 ${cost}`}</span>
+      </button>
+    `;
+
+    const buyBtn = card.querySelector('.shop-buy-btn');
+    if (canAfford) {
+      buyBtn.addEventListener('click', () => {
+        gameState.crystals -= cost;
+        gameState.upgrades[upg.id] = curLevel + 1;
+        saveState();
+        updateHUD();
+        renderShop();
+        audioSystem.playCollect(true);
+      });
+    }
+
+    container.appendChild(card);
+  });
+}
+
+function renderGoals() {
+  const container = document.getElementById('goals-container');
+  container.innerHTML = '';
+  const isTr = gameState.language === 'tr';
+
+  GOALS.forEach(goal => {
+    const unlocked = gameState.unlockedGoals.includes(goal.id);
+    const card = document.createElement('div');
+    card.className = 'goal-card';
+    card.innerHTML = `
+      <div class="goal-info">
+        <span class="goal-title">${isTr ? goal.tr : goal.en}</span>
+        <span class="goal-desc">${isTr ? goal.descTr : goal.descEn}</span>
+      </div>
+      <span class="goal-badge ${unlocked ? 'unlocked' : 'locked'}">
+        ${unlocked ? (isTr ? 'AÇILDI ✓' : 'UNLOCKED ✓') : (isTr ? 'KİLİTLİ 🔒' : 'LOCKED 🔒')}
+      </span>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function updatePhysics() {
+  if (screenShake > 0) screenShake *= 0.85;
+
+  if (gameMode !== 'PLAYING') return;
+
+  const pullUpgradeMult = 1 + (gameState.upgrades.strength * 0.35);
+  const hookSpeedUpgradeMult = 1 + (gameState.upgrades.hookSpeed * 0.3);
+
+  if (hook.state === 'SWING') {
+    hook.angle += hook.angleSpeed * hook.angleDir;
+    if (hook.angle > Math.PI / 2.3) hook.angleDir = -1;
+    if (hook.angle < -Math.PI / 2.3) hook.angleDir = 1;
+
+    hook.x = pivot.x + Math.sin(hook.angle) * hook.length;
+    hook.y = pivot.y + Math.cos(hook.angle) * hook.length;
+  }
+  else if (hook.state === 'EXTEND') {
+    const speed = 12 * hookSpeedUpgradeMult;
+    hook.length += speed;
+    hook.x = pivot.x + Math.sin(hook.angle) * hook.length;
+    hook.y = pivot.y + Math.cos(hook.angle) * hook.length;
+
+    if (hook.x <= 15 || hook.x >= canvas.width - 15 || hook.y >= canvas.height - 15 || hook.length >= hook.maxL) {
+      hook.state = 'RETRACT';
+    } else {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const dx = hook.x - item.x;
+        const dy = hook.y - item.y;
+        const minDist = item.radius + 8;
+
+        // Performance optimization: Avoid Math.sqrt in hot collision detection loop
+        if (dx * dx + dy * dy < minDist * minDist) {
+          hook.caughtItem = item;
+          items.splice(i, 1);
+          hook.state = 'RETRACT';
+          audioSystem.playGrab();
+          createParticles(hook.x, hook.y, item.color, 8);
+          break;
+        }
+      }
+    }
+  }
+  else if (hook.state === 'RETRACT') {
+    let weightPenalty = hook.caughtItem ? hook.caughtItem.weight : 1.0;
+    let retractSpeed = (14 / weightPenalty) * pullUpgradeMult;
+
+    hook.length -= retractSpeed;
+    if (hook.length <= hook.minL) {
+      hook.length = hook.minL;
+      hook.state = 'SWING';
+
+      if (hook.caughtItem) {
+        const item = hook.caughtItem;
+        let gainedScore = item.value;
+
+        if (item.isCrystal) {
+          gameState.crystals += 1;
+          const crystalBonusMult = 1 + (gameState.upgrades.crystalBonus * 0.5);
+          gainedScore = Math.round(gainedScore * crystalBonusMult);
+        }
+
+        score += gainedScore;
+        saveState();
+        updateHUD();
+        audioSystem.playCollect(item.isCrystal);
+
+        createParticles(pivot.x, pivot.y + 10, item.color, 16);
+        addFloatingText(pivot.x, pivot.y - 10, `+${gainedScore}`, item.isCrystal ? '#a855f7' : '#fbbf24');
+        screenShake = 6;
+
+        hook.caughtItem = null;
+        checkGoals();
+      }
+    } else {
+      hook.x = pivot.x + Math.sin(hook.angle) * hook.length;
+      hook.y = pivot.y + Math.cos(hook.angle) * hook.length;
+
+      if (hook.caughtItem) {
+        hook.caughtItem.x = hook.x;
+        hook.caughtItem.y = hook.y + hook.caughtItem.radius / 2;
+      }
+    }
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.alpha -= p.life;
+    if (p.alpha <= 0) particles.splice(i, 1);
+  }
+
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const ft = floatingTexts[i];
+    ft.y += ft.vy;
+    ft.alpha -= 0.02;
+    if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+  }
+}
+
+function drawGame() {
+  ctx.save();
+
+  if (screenShake > 0.5) {
+    ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
+  }
+
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = '#1e293b';
+  ctx.fillRect(0, 0, canvas.width, 80);
+  ctx.fillStyle = '#334155';
+  ctx.fillRect(0, 76, canvas.width, 4);
+
+  ctx.fillStyle = '#78350f';
+  ctx.fillRect(pivot.x - 60, 10, 12, 70);
+  ctx.fillRect(pivot.x + 48, 10, 12, 70);
+  ctx.fillRect(pivot.x - 70, 10, 140, 14);
+
+  ctx.fillStyle = '#38bdf8';
+  ctx.beginPath();
+  ctx.arc(pivot.x, pivot.y, 14, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = '#d97706';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(pivot.x, pivot.y);
+  ctx.lineTo(hook.x, hook.y);
+  ctx.stroke();
+
+  ctx.save();
+  ctx.translate(hook.x, hook.y);
+  ctx.rotate(-hook.angle);
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(0, 10, 10, 0.2 * Math.PI, 0.8 * Math.PI, false);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, 10, 10, 0.2 * Math.PI, 0.8 * Math.PI, true);
+  ctx.stroke();
+  ctx.restore();
+
+  // Performance optimization: Use indexed for loops instead of forEach for rendering items
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    ctx.save();
+    ctx.translate(item.x, item.y);
+
+    if (item.isCrystal) {
+      ctx.shadowColor = item.color;
+      ctx.shadowBlur = 12;
+
+      ctx.fillStyle = item.color;
+      ctx.beginPath();
+      ctx.moveTo(0, -item.radius);
+      ctx.lineTo(item.radius * 0.8, -item.radius * 0.2);
+      ctx.lineTo(item.radius * 0.6, item.radius);
+      ctx.lineTo(-item.radius * 0.6, item.radius);
+      ctx.lineTo(-item.radius * 0.8, -item.radius * 0.2);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.beginPath();
+      ctx.moveTo(0, -item.radius);
+      ctx.lineTo(item.radius * 0.4, 0);
+      ctx.lineTo(0, item.radius);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.fillStyle = item.color;
+      ctx.beginPath();
+      ctx.arc(0, 0, item.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.beginPath();
+      ctx.arc(-item.radius * 0.3, -item.radius * 0.3, item.radius * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  if (hook.caughtItem) {
+    const item = hook.caughtItem;
+    ctx.save();
+    ctx.translate(item.x, item.y);
+    ctx.fillStyle = item.color;
+    ctx.beginPath();
+    ctx.arc(0, 0, item.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Performance optimization: Avoid per-particle ctx.save/restore context switching overhead
+  if (particles.length > 0) {
+    const prevAlpha = ctx.globalAlpha;
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = prevAlpha;
+  }
+
+  // Performance optimization: Hoist text styles and remove per-text ctx.save/restore
+  if (floatingTexts.length > 0) {
+    const prevAlpha = ctx.globalAlpha;
+    ctx.font = 'bold 20px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    for (let i = 0; i < floatingTexts.length; i++) {
+      const ft = floatingTexts[i];
+      ctx.globalAlpha = ft.alpha;
+      ctx.fillStyle = ft.color;
+      ctx.fillText(ft.text, ft.x, ft.y);
+    }
+    ctx.globalAlpha = prevAlpha;
+  }
+
+  if (gameMode !== 'PLAYING') {
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.textAlign = 'center';
+
+    if (gameMode === 'START') {
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 36px system-ui, sans-serif';
+      ctx.fillText('KANCA', canvas.width / 2, 180);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '18px system-ui, sans-serif';
+      ctx.fillText(gameState.language === 'tr' ? 'Derin madenlerdeki kristalleri kancanla topla!' : 'Collect crystals in deep mines with your hook!', canvas.width / 2, 230);
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = 'bold 22px system-ui, sans-serif';
+      ctx.fillText(gameState.language === 'tr' ? 'BAŞLAMAK İÇİN TIKLA VEYA BOŞLUĞA BAS' : 'CLICK OR PRESS SPACE TO START', canvas.width / 2, 320);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '14px system-ui, sans-serif';
+      ctx.fillText(`${gameState.language === 'tr' ? 'En Yüksek Skor' : 'High Score'}: ${gameState.highScore}`, canvas.width / 2, 370);
+    }
+    else if (gameMode === 'LEVEL_CLEAR') {
+      ctx.fillStyle = '#22c55e';
+      ctx.font = 'bold 34px system-ui, sans-serif';
+      ctx.fillText(gameState.language === 'tr' ? 'SEVİYE TAMAMLANDI!' : 'LEVEL COMPLETED!', canvas.width / 2, 180);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '20px system-ui, sans-serif';
+      ctx.fillText(`${gameState.language === 'tr' ? 'Skor' : 'Score'}: ${score} / ${targetScore}`, canvas.width / 2, 240);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 20px system-ui, sans-serif';
+      ctx.fillText(gameState.language === 'tr' ? 'SONRAKİ SEVİYE İÇİN TIKLAYIN' : 'CLICK TO START NEXT LEVEL', canvas.width / 2, 320);
+    }
+    else if (gameMode === 'GAME_OVER') {
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 34px system-ui, sans-serif';
+      ctx.fillText(gameState.language === 'tr' ? 'SÜRE BİTTİ — OYUN BİTTİ' : 'TIME UP — GAME OVER', canvas.width / 2, 180);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '20px system-ui, sans-serif';
+      ctx.fillText(`${gameState.language === 'tr' ? 'Aralıktaki Skor' : 'Final Score'}: ${score}`, canvas.width / 2, 230);
+      ctx.fillText(`${gameState.language === 'tr' ? 'Hedef' : 'Target'}: ${targetScore}`, canvas.width / 2, 265);
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = 'bold 20px system-ui, sans-serif';
+      ctx.fillText(gameState.language === 'tr' ? 'YENİDEN BAŞLAMAK İÇİN TIKLAYIN' : 'CLICK TO RESTART', canvas.width / 2, 340);
+    }
+  }
+
+  ctx.restore();
+}
+
+function gameLoop() {
+  updatePhysics();
+  drawGame();
+  requestAnimationFrame(gameLoop);
+}
+
+// Control Event Listeners
+document.getElementById('shop-btn').addEventListener('click', () => {
+  renderShop();
+  document.getElementById('shop-modal').classList.add('active');
+});
+
+document.getElementById('goals-btn').addEventListener('click', () => {
+  renderGoals();
+  document.getElementById('goals-modal').classList.add('active');
+});
+
+document.getElementById('policy-btn').addEventListener('click', () => {
+  document.getElementById('policy-modal').classList.add('active');
+});
+
+document.getElementById('audio-btn').addEventListener('click', () => {
+  audioSystem.muted = !audioSystem.muted;
+  document.getElementById('audio-btn').textContent = audioSystem.muted ? '🔇' : '🔊';
+});
+
+document.getElementById('lang-btn').addEventListener('click', () => {
+  gameState.language = gameState.language === 'tr' ? 'en' : 'tr';
+  saveState();
+  updateLanguageUI();
+});
+
+document.getElementById('theme-btn').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const target = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', target);
+  localStorage.setItem('theme', target);
+});
+
+document.querySelectorAll('.close-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.modal').classList.remove('active');
+  });
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal')) {
+    e.target.classList.remove('active');
+  }
+});
+
+loadSavedState();
+updateHUD();
+updateLanguageUI();
+requestAnimationFrame(gameLoop);
+</script>
 </body>
 </html>
