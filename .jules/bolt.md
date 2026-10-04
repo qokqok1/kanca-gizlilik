@@ -1,0 +1,3 @@
+## 2026-10-04 - Canvas 2D State Save/Restore Overhead in Particle Loops
+**Learning:** Calling `ctx.save()` and `ctx.restore()` inside high-frequency animation loops (like rendering particles or floating labels) incurs significant canvas state stack overhead. Furthermore, repeated `Math.sqrt` calls in collision loops introduce unnecessary square root operations.
+**Action:** Prefer restoring global canvas state once (e.g. `const prevAlpha = ctx.globalAlpha; ... ctx.globalAlpha = prevAlpha;`), hoist static text styles outside loops, and use squared distance checks (`dx * dx + dy * dy < r * r`) for 2D collision detection.
